@@ -1,18 +1,10 @@
 module rooch_blog::rooch_blog {
     use std::error;
-    // use std::option;
     use std::signer;
     use std::string::String;
     use moveos_std::object_id::ObjectID;
-    // use rooch_blog::article_created;
     use moveos_std::object::Object;
-    // use rooch_blog::article_create_logic;
-    // use moveos_std::object_storage;
-    // use moveos_std::storage_context;
-    // use moveos_std::object_id::ObjectID;
     use moveos_std::storage_context::StorageContext;
-    // use moveos_std::object::{Self, Object};
-
     use rooch_blog::article;
 
     const EID_DATA_TOO_LONG: u64 = 102;
@@ -140,4 +132,49 @@ module rooch_blog::rooch_blog {
         article::emit_article_updated(storage_ctx, article_updated);
     }
 
+    // === Delete ===
+
+    fun delete_verify(
+        storage_ctx: &mut StorageContext,
+        account: &signer,
+        article_obj: &Object<article::Article>,
+    ): article::ArticleDeleted {
+        let _ = storage_ctx;
+        let _ = account;
+        article::new_article_deleted(
+            article_obj,
+        )
+    }
+
+    fun delete_mutate(
+        storage_ctx: &mut StorageContext,
+        article_deleted: &article::ArticleDeleted,
+        article_obj: Object<article::Article>,
+    ): Object<article::Article> {
+        let id = article::id(&article_obj);
+        let _ = storage_ctx;
+        let _ = id;
+        let _ = article_deleted;
+        article_obj
+    }
+
+    public entry fun delete(
+        storage_ctx: &mut StorageContext,
+        account: &signer,
+        id: ObjectID,
+    ) {
+        let article_obj = article::remove_article(storage_ctx, id);
+        let article_deleted = delete_verify(
+            storage_ctx,
+            account,
+            &article_obj,
+        );
+        let updated_article_obj = delete_mutate(
+            storage_ctx,
+            &article_deleted,
+            article_obj,
+        );
+        article::drop_article(updated_article_obj);
+        article::emit_article_deleted(storage_ctx, article_deleted);
+    }
 }

@@ -9,10 +9,6 @@ module rooch_blog::article {
     use std::option;
     use std::signer;
     use std::string::String;
-    // friend rooch_blog::article_create_logic;
-    // friend rooch_blog::article_update_logic;
-    // friend rooch_blog::article_delete_logic;
-    // friend rooch_blog::article_aggregate;
     friend rooch_blog::rooch_blog;
 
     const EID_DATA_TOO_LONG: u64 = 102;
