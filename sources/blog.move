@@ -3,6 +3,7 @@ module rooch_blog::rooch_blog {
     // use std::option;
     use std::signer;
     use std::string::String;
+    use moveos_std::object_id::ObjectID;
     // use rooch_blog::article_created;
     use moveos_std::object::Object;
     // use rooch_blog::article_create_logic;
@@ -53,9 +54,7 @@ module rooch_blog::rooch_blog {
         article_created: &article::ArticleCreated,
     ): Object<article::Article> {
         let title = article::article_created_title(article_created);
-        // let title = article_created::title(article_created);
         let body = article::article_created_body(article_created);
-        // let body = article_created::body(article_created);
         article::create_article(
             storage_ctx,
             title,
@@ -83,4 +82,62 @@ module rooch_blog::rooch_blog {
         article::add_article(storage_ctx, article_obj);
         article::emit_article_created(storage_ctx, article_created);
     }
+
+    // === Update ===
+
+    fun update_verify(
+        storage_ctx: &mut StorageContext,
+        account: &signer,
+        title: String,
+        body: String,
+        article_obj: &Object<article::Article>,
+    ): article::ArticleUpdated {
+        let _ = storage_ctx;
+        let _ = account;
+        article::new_article_updated(
+            article_obj,
+            title,
+            body,
+        )
+    }
+
+    fun update_mutate(
+        storage_ctx: &mut StorageContext,
+        article_updated: &article::ArticleUpdated,
+        article_obj: Object<article::Article>,
+    ): Object<article::Article> {
+        let title = article::article_updated_title(article_updated);
+        let body = article::article_updated_body(article_updated);
+        let id = article::article_updated_id(article_updated);
+        let _ = storage_ctx;
+        let _ = id;
+        article::set_title(&mut article_obj, title);
+        article::set_body(&mut article_obj, body);
+        article_obj
+    }
+
+    public entry fun update(
+        storage_ctx: &mut StorageContext,
+        account: &signer,
+        id: ObjectID,
+        title: String,
+        body: String,
+    ) {
+        let article_obj = article::remove_article(storage_ctx, id);
+        let article_updated = update_verify(
+            storage_ctx,
+            account,
+            title,
+            body,
+            &article_obj,
+        );
+        let updated_article_obj = update_mutate(
+            storage_ctx,
+            &article_updated,
+            article_obj,
+        );
+        article::update_version_and_add(storage_ctx, updated_article_obj);
+        article::emit_article_updated(storage_ctx, article_updated);
+    }
+
 }
