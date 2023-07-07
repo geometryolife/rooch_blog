@@ -13,16 +13,11 @@ module rooch_blog::rooch_blog {
 
     // === Initialize ===
 
-    // Define a function that initialize the blog
-    fun init_blog(storage_ctx: &mut StorageContext, account: &signer) {
+    // Define a function that initialize the blog app
+    fun init(storage_ctx: &mut StorageContext, account: &signer) {
         assert!(signer::address_of(account) == @rooch_blog, error::invalid_argument(ENOT_GENESIS_ACCOUNT));
         let _ = storage_ctx;
         let _ = account;
-    }
-
-    // The entry function that initializes.
-    entry fun initialize(storage_ctx: &mut StorageContext, account: &signer) {
-        init_blog(storage_ctx, account);
     }
 
     // === Create ===
