@@ -3,7 +3,7 @@ module rooch_blog::rooch_blog {
     // use std::option;
     use std::signer;
     use std::string::String;
-    use rooch_blog::article_created;
+    // use rooch_blog::article_created;
     use moveos_std::object::Object;
     // use rooch_blog::article_create_logic;
     // use moveos_std::object_storage;
@@ -52,8 +52,10 @@ module rooch_blog::rooch_blog {
         storage_ctx: &mut StorageContext,
         article_created: &article::ArticleCreated,
     ): Object<article::Article> {
-        let title = article_created::title(article_created);
-        let body = article_created::body(article_created);
+        let title = article::article_created_title(article_created);
+        // let title = article_created::title(article_created);
+        let body = article::article_created_body(article_created);
+        // let body = article_created::body(article_created);
         article::create_article(
             storage_ctx,
             title,
