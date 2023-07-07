@@ -34,7 +34,7 @@ module rooch_blog::rooch_blog {
 
     // === Create ===
 
-    public fun verify(
+    fun create_verify(
         storage_ctx: &mut StorageContext,
         account: &signer,
         title: String,
@@ -48,7 +48,7 @@ module rooch_blog::rooch_blog {
         )
     }
 
-    public fun mutate(
+    fun create_mutate(
         storage_ctx: &mut StorageContext,
         article_created: &article::ArticleCreated,
     ): Object<article::Article> {
@@ -69,13 +69,13 @@ module rooch_blog::rooch_blog {
         title: String,
         body: String,
     ) {
-        let article_created = verify(
+        let article_created = create_verify(
             storage_ctx,
             account,
             title,
             body,
         );
-        let article_obj = mutate(
+        let article_obj = create_mutate(
             storage_ctx,
             &article_created,
         );
