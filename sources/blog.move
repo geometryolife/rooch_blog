@@ -27,7 +27,7 @@ module rooch_blog::rooch_blog {
         account: &signer,
         title: String,
         body: String,
-    ): article::ArticleCreated {
+    ): article::ArticleCreatedEvent {
         let _ = storage_ctx;
         let _ = account;
         article::new_article_created(
@@ -38,7 +38,7 @@ module rooch_blog::rooch_blog {
 
     fun create_mutate(
         storage_ctx: &mut StorageContext,
-        article_created: &article::ArticleCreated,
+        article_created: &article::ArticleCreatedEvent,
     ): Object<article::Article> {
         let title = article::article_created_title(article_created);
         let body = article::article_created_body(article_created);
@@ -78,7 +78,7 @@ module rooch_blog::rooch_blog {
         title: String,
         body: String,
         article_obj: &Object<article::Article>,
-    ): article::ArticleUpdated {
+    ): article::ArticleUpdatedEvent {
         let _ = storage_ctx;
         let _ = account;
         article::new_article_updated(
@@ -90,7 +90,7 @@ module rooch_blog::rooch_blog {
 
     fun update_mutate(
         storage_ctx: &mut StorageContext,
-        article_updated: &article::ArticleUpdated,
+        article_updated: &article::ArticleUpdatedEvent,
         article_obj: Object<article::Article>,
     ): Object<article::Article> {
         let title = article::article_updated_title(article_updated);
@@ -133,7 +133,7 @@ module rooch_blog::rooch_blog {
         storage_ctx: &mut StorageContext,
         account: &signer,
         article_obj: &Object<article::Article>,
-    ): article::ArticleDeleted {
+    ): article::ArticleDeletedEvent {
         let _ = storage_ctx;
         let _ = account;
         article::new_article_deleted(
@@ -143,7 +143,7 @@ module rooch_blog::rooch_blog {
 
     fun delete_mutate(
         storage_ctx: &mut StorageContext,
-        article_deleted: &article::ArticleDeleted,
+        article_deleted: &article::ArticleDeletedEvent,
         article_obj: Object<article::Article>,
     ): Object<article::Article> {
         let id = article::id(&article_obj);

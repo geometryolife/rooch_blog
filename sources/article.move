@@ -66,55 +66,55 @@ module rooch_blog::article {
         }
     }
 
-    struct ArticleCreated has key {
+    struct ArticleCreatedEvent has key {
         id: option::Option<ObjectID>,
         title: String,
         body: String,
     }
 
-    public fun article_created_id(article_created: &ArticleCreated): option::Option<ObjectID> {
+    public fun article_created_id(article_created: &ArticleCreatedEvent): option::Option<ObjectID> {
         article_created.id
     }
 
-    public(friend) fun set_article_created_id(article_created: &mut ArticleCreated, id: ObjectID) {
+    public(friend) fun set_article_created_id(article_created: &mut ArticleCreatedEvent, id: ObjectID) {
         article_created.id = option::some(id);
     }
 
-    public fun article_created_title(article_created: &ArticleCreated): String {
+    public fun article_created_title(article_created: &ArticleCreatedEvent): String {
         article_created.title
     }
 
-    public fun article_created_body(article_created: &ArticleCreated): String {
+    public fun article_created_body(article_created: &ArticleCreatedEvent): String {
         article_created.body
     }
 
     public fun new_article_created(
         title: String,
         body: String,
-    ): ArticleCreated {
-        ArticleCreated {
+    ): ArticleCreatedEvent {
+        ArticleCreatedEvent {
             id: option::none(),
             title,
             body,
         }
     }
 
-    struct ArticleUpdated has key {
+    struct ArticleUpdatedEvent has key {
         id: ObjectID,
         version: u64,
         title: String,
         body: String,
     }
 
-    public fun article_updated_id(article_updated: &ArticleUpdated): ObjectID {
+    public fun article_updated_id(article_updated: &ArticleUpdatedEvent): ObjectID {
         article_updated.id
     }
 
-    public fun article_updated_title(article_updated: &ArticleUpdated): String {
+    public fun article_updated_title(article_updated: &ArticleUpdatedEvent): String {
         article_updated.title
     }
 
-    public fun article_updated_body(article_updated: &ArticleUpdated): String {
+    public fun article_updated_body(article_updated: &ArticleUpdatedEvent): String {
         article_updated.body
     }
 
@@ -122,8 +122,8 @@ module rooch_blog::article {
         article_obj: &Object<Article>,
         title: String,
         body: String,
-    ): ArticleUpdated {
-        ArticleUpdated {
+    ): ArticleUpdatedEvent {
+        ArticleUpdatedEvent {
             id: id(article_obj),
             version: version(article_obj),
             title,
@@ -131,19 +131,19 @@ module rooch_blog::article {
         }
     }
 
-    struct ArticleDeleted has key {
+    struct ArticleDeletedEvent has key {
         id: ObjectID,
         version: u64,
     }
 
-    public fun article_deleted_id(article_deleted: &ArticleDeleted): ObjectID {
+    public fun article_deleted_id(article_deleted: &ArticleDeletedEvent): ObjectID {
         article_deleted.id
     }
 
     public fun new_article_deleted(
         article_obj: &Object<Article>,
-    ): ArticleDeleted {
-        ArticleDeleted {
+    ): ArticleDeletedEvent {
+        ArticleDeletedEvent {
             id: id(article_obj),
             version: version(article_obj),
         }
@@ -209,15 +209,15 @@ module rooch_blog::article {
         } = article;
     }
 
-    public(friend) fun emit_article_created(storage_ctx: &mut StorageContext, article_created: ArticleCreated) {
+    public(friend) fun emit_article_created(storage_ctx: &mut StorageContext, article_created: ArticleCreatedEvent) {
         event::emit_event(storage_ctx, article_created);
     }
 
-    public(friend) fun emit_article_updated(storage_ctx: &mut StorageContext, article_updated: ArticleUpdated) {
+    public(friend) fun emit_article_updated(storage_ctx: &mut StorageContext, article_updated: ArticleUpdatedEvent) {
         event::emit_event(storage_ctx, article_updated);
     }
 
-    public(friend) fun emit_article_deleted(storage_ctx: &mut StorageContext, article_deleted: ArticleDeleted) {
+    public(friend) fun emit_article_deleted(storage_ctx: &mut StorageContext, article_deleted: ArticleDeletedEvent) {
         event::emit_event(storage_ctx, article_deleted);
     }
 }
