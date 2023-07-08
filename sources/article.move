@@ -21,6 +21,10 @@ module rooch_blog::article {
         let _ = account;
     }
 
+    // 定义文章的结构，后边被 `&Object<>` 包裹后，成为了对象的值，对象的值必须是对象的最后一个字段
+    // 对象是一个特殊的结构体，由对象 ID、对象拥有者的地址、对象的值组成
+    // 对象没有任何能力（ability），不能被丢弃、复制、存储
+    // 因此，在使用的过程中需要传递，对象的可变引用或不可变引用
     struct Article has key {
         version: u64,
         title: String,
@@ -28,35 +32,56 @@ module rooch_blog::article {
     }
 
     /// get object id
+    // 这个函数获取对象的 ID，不涉及修改，所以参数传递文章对象的不可变引用
+    // object 模块包含对象结构体的定义，以及操作对象结构体的函数
+    // `object::id` 获取对象的 `ObjectID`，目前的 ObjectID 是一个地址
     public fun id(article_obj: &Object<Article>): ObjectID {
         object::id(article_obj)
     }
 
+    /// 获取 Article 对象的版本
+    // 传递文章对象的不可变引用，返回一个 u64 的文章版本值
     public fun version(article_obj: &Object<Article>): u64 {
+        // borrow 获取对象的值，再通过点运算，获取对象值（Article）中的版本
         object::borrow(article_obj).version
     }
 
+    /// 获取 Article 对象的标题
+    // 传递文章对象的不可变引用，返回一个 String 类型
     public fun title(article_obj: &Object<Article>): String {
+        // borrow 获取对象的值，再通过点运算，获取对象值（Article）中的标题
         object::borrow(article_obj).title
     }
 
+    /// 设置 Article 对象的标题
+    // 传递文章对象的可变引用和一个 String 类型值（文章标题）
     public(friend) fun set_title(article_obj: &mut Object<Article>, title: String) {
+        // borrow_mut 获取对象的可变值，再通过点运算，获取对象可变值（Article）中的标题，通过赋值来修改
         object::borrow_mut(article_obj).title = title;
     }
 
+    /// 获取 Article 对象的正文
+    // 传递文章对象的不可变引用，返回一个 String 类型
     public fun body(article_obj: &Object<Article>): String {
+        // borrow 获取对象的值，再通过点运算，获取对象值（Article）中的正文
         object::borrow(article_obj).body
     }
 
+    /// 设置 Article 对象的正文
+    // 传递文章对象的可变引用和一个 String 类型值（文章正文）
     public(friend) fun set_body(article_obj: &mut Object<Article>, body: String) {
+        // borrow_mut 获取对象的可变值，再通过点运算，获取对象可变值（Article）中的正文，通过赋值来修改
         object::borrow_mut(article_obj).body = body;
     }
 
+    /// 定义新建文章的函数
+    // 新建文章，传递标题、正文参数，返回一个 Article 结构体，版本号设置为零
     fun new_article(
         _tx_ctx: &mut tx_context::TxContext,
         title: String,
         body: String,
     ): Article {
+        // TODO 删除判断逻辑
         assert!(std::string::length(&title) <= 200, EID_DATA_TOO_LONG);
         assert!(std::string::length(&body) <= 2000, EID_DATA_TOO_LONG);
         Article {
@@ -66,12 +91,24 @@ module rooch_blog::article {
         }
     }
 
+    // 定义创建文章的事件
+    // id 创建文章的对象 ID，对象 ID 底层是地址，用来标识创建文章的地址
+    // title
+    // body
     struct ArticleCreatedEvent has key {
+        // TODO 直接使用 ObjectID
         id: option::Option<ObjectID>,
         title: String,
         body: String,
     }
 
+    // 获取
+    /// get object id
+    // 这个函数获取对象的 ID，不涉及修改，所以参数传递文章对象的不可变引用
+    // object 模块包含对象结构体的定义，以及操作对象结构体的函数
+    // `object::id` 获取对象的 `ObjectID`，目前的 ObjectID 是一个地址
+    /// 获取文章创建事件的 ID
+    // 这个函数获取创建文章事件的 id，返回对象
     public fun article_created_id(article_created: &ArticleCreatedEvent): option::Option<ObjectID> {
         article_created.id
     }
