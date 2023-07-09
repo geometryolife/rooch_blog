@@ -102,35 +102,41 @@ module rooch_blog::article {
         body: String,
     }
 
-    // 获取
-    /// get object id
-    // 这个函数获取对象的 ID，不涉及修改，所以参数传递文章对象的不可变引用
-    // object 模块包含对象结构体的定义，以及操作对象结构体的函数
-    // `object::id` 获取对象的 `ObjectID`，目前的 ObjectID 是一个地址
-    /// 获取文章创建事件的 ID
-    // 这个函数获取创建文章事件的 id，返回对象
-    public fun article_created_id(article_created: &ArticleCreatedEvent): option::Option<ObjectID> {
+    /// 获取创建文章事件的 ID
+    // 这个函数获取创建文章事件的 id，参数传入创建文章事件的不可变引用，返回对象 ID（底层是 address）
+    public fun article_created_id(article_created: &ArticleCreatedEvent): option::Option<ObjectID> { // TODO 去掉 Option 包裹
         article_created.id
     }
 
+    /// 设置创建文章事件的 ID
+    // 这个函数设置创建文章事件的 id，参数传入创建文章事件的可变引用和对象 ID
     public(friend) fun set_article_created_id(article_created: &mut ArticleCreatedEvent, id: ObjectID) {
+        // 获取 ArticleCreatedEvent 可变引用的 id，通过赋值修改 id
         article_created.id = option::some(id);
     }
 
+    /// 获取创建文章事件的标题
+    // 传入创建文章事件的不可变引用，返回文章的标题
     public fun article_created_title(article_created: &ArticleCreatedEvent): String {
+        // 通过成员运算获取文章的标题
         article_created.title
     }
 
+    /// 获取创建文章事件的正文
+    // 传入创建文章事件的不可变引用，返回文章的正文
     public fun article_created_body(article_created: &ArticleCreatedEvent): String {
+        // 通过成员运算获取文章的正文
         article_created.body
     }
 
+    /// 定义创建文章事件的函数
+    // 传入文章的标题和正文，返回创建文章的事件
     public fun new_article_created(
         title: String,
         body: String,
     ): ArticleCreatedEvent {
         ArticleCreatedEvent {
-            id: option::none(),
+            id: option::none(), // TODO 换成 ObjectID
             title,
             body,
         }
