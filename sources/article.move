@@ -77,7 +77,7 @@ module rooch_blog::article {
     /// 定义新建文章的函数
     // 新建文章，传递标题、正文参数，返回一个 Article 结构体，版本号设置为零
     fun new_article(
-        _tx_ctx: &mut tx_context::TxContext,
+        _tx_ctx: &mut tx_context::TxContext,  // TODO 需不需要
         title: String,
         body: String,
     ): Article {
@@ -90,6 +90,33 @@ module rooch_blog::article {
             body,
         }
     }
+
+    /// 定义新建文章对象的函数
+    // 这个提供给入口函数使用，传入创建文章的存储上下文、标题、正文，返回文章对象（Object<Article>）
+    public fun create_article(
+        storage_ctx: &mut StorageContext,
+        title: String,
+        body: String,
+    ): Object<Article> {
+        // 存储上下文封装了交易上下文和对象存储，通过 tx_context_mut 从存储上下文中获取交易上下文的可变引用
+        let tx_ctx = storage_context::tx_context_mut(storage_ctx);
+        // 创建文章
+        let article = new_article(
+            tx_ctx,
+            title,
+            body,
+        );
+        // 获取文章对象的拥有者地址，使用 sender 函数从交易上下文获取
+        let obj_owner = tx_context::sender(tx_ctx);
+        // 使用 object::new 来构建一个新的对象，对象包含 ID，拥有者的地址，以及对象的值
+        let article_obj = object::new(
+            tx_ctx,
+            obj_owner,
+            article,
+        );
+        article_obj
+    }
+
 
     // 定义创建文章的事件
     // id 创建文章的对象 ID，对象 ID 底层是地址，用来标识创建文章的地址
@@ -192,26 +219,6 @@ module rooch_blog::article {
         }
     }
 
-    public fun create_article(
-        storage_ctx: &mut StorageContext,
-        title: String,
-        body: String,
-    ): Object<Article> {
-        let tx_ctx = storage_context::tx_context_mut(storage_ctx);
-        let article = new_article(
-            tx_ctx,
-            title,
-            body,
-        );
-        let obj_owner = tx_context::sender(tx_ctx);
-        let article_obj = object::new(
-            tx_ctx,
-            obj_owner,
-            article,
-        );
-        article_obj
-    }
-
     public(friend) fun update_version_and_add(storage_ctx: &mut StorageContext, article_obj: Object<Article>) {
         object::borrow_mut(&mut article_obj).version = object::borrow( &mut article_obj).version + 1;
         //assert!(object::borrow(&article_obj).version != 0, EINAPPROPRIATE_VERSION);
@@ -223,7 +230,9 @@ module rooch_blog::article {
         object_storage::remove<Article>(obj_store, obj_id)
     }
 
+    // 添加文章，传入存储上下文的可变引用，以及文章对象
     public(friend) fun add_article(storage_ctx: &mut StorageContext, article_obj: Object<Article>) {
+        // borrow 获取对象值（Article）的版本，传入文章对象的不可变引用，
         assert!(object::borrow(&article_obj).version == 0, EINAPPROPRIATE_VERSION);
         private_add_article(storage_ctx, article_obj);
     }
